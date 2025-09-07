@@ -1,0 +1,43 @@
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+
+# This stage is used to build the service project
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["Directory.Build.props", "."]
+COPY ["src/API/API.Managemnt/API.Managemnt.csproj", "src/API/API.Managemnt/"]
+COPY ["src/Module/Evently/Module.Evently.InfraStructure/Module.Evently.InfraStructure.csproj", "src/Module/Evently/Module.Evently.InfraStructure/"]
+COPY ["BuidingBlock/BuidingBlock.Infrastructure/BuidingBlock.Infrastructure.csproj", "BuidingBlock/BuidingBlock.Infrastructure/"]
+COPY ["BuidingBlock/BuidingBlock.Application/BuidingBlock.Application.csproj", "BuidingBlock/BuidingBlock.Application/"]
+COPY ["BuidingBlock/BuidingBlock.Domain/BuidingBlock.Domain.csproj", "BuidingBlock/BuidingBlock.Domain/"]
+COPY ["src/Module/Evently/Module.Evently.Application/Module.Evently.Application.csproj", "src/Module/Evently/Module.Evently.Application/"]
+COPY ["src/Module/Evently/Module.Evently.Domain/Module.Evently.Domain.csproj", "src/Module/Evently/Module.Evently.Domain/"]
+COPY ["src/Module/Evently/Module.Evently.Presentation/Module.Evently.Presentation.csproj", "src/Module/Evently/Module.Evently.Presentation/"]
+COPY ["BuidingBlock/BuidingBlock.Presentation/BuidingBlock.Presentation.csproj", "BuidingBlock/BuidingBlock.Presentation/"]
+COPY ["src/Module/Module.User.Infrastructure/Module.User.Infrastructure.csproj", "src/Module/Module.User.Infrastructure/"]
+COPY ["src/Module/Module.User.Application/Module.User.Application.csproj", "src/Module/Module.User.Application/"]
+COPY ["src/Module/User/Module.User.Domain/Module.User.Domain.csproj", "src/Module/User/Module.User.Domain/"]
+COPY ["src/Module/Module.User.Presentation/Module.User.Presentation.csproj", "src/Module/Module.User.Presentation/"]
+RUN dotnet restore "./src/API/API.Managemnt/API.Managemnt.csproj"
+COPY . .
+WORKDIR "/src/src/API/API.Managemnt"
+RUN dotnet build "./API.Managemnt.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# This stage is used to publish the service project to be copied to the final stage
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./API.Managemnt.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "API.Managemnt.dll"]

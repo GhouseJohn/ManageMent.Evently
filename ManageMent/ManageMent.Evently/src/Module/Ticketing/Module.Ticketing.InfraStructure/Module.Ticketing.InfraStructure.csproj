@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\BuidingBlock\BuidingBlock.Infrastructure\BuidingBlock.Infrastructure.csproj" />
+    <ProjectReference Include="..\Module.Ticketing.Application\Module.Ticketing.Application.csproj" />
+    <ProjectReference Include="..\Module.Ticketing.Presentation\Module.Ticketing.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

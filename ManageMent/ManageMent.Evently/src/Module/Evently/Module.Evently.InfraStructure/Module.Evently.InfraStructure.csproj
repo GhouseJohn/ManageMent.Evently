@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+	
+	<ItemGroup>
+	  <Compile Remove="MapEndpoints.cs" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+    <ProjectReference Include="..\..\..\..\BuidingBlock\BuidingBlock.Infrastructure\BuidingBlock.Infrastructure.csproj" />
+    <ProjectReference Include="..\Module.Evently.Application\Module.Evently.Application.csproj" />
+    <ProjectReference Include="..\Module.Evently.Presentation\Module.Evently.Presentation.csproj" />
+  </ItemGroup>
+</Project>
